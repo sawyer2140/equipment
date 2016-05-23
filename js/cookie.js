@@ -10,13 +10,30 @@ function getCookie(name) {
 
     var varCookie = document.cookie;
 
-    var cookieStart = varCookie.indexOf("{\"" + name + "");
-    var cookieEnd = varCookie.indexOf("};");
+    var cookieStart = -1;
+    var cookieEnd = -1;
+
+    if (varCookie.indexOf("PHPSESSID") == 0) {
+
+        cookieStart = varCookie.indexOf("PHPSESSID") + 1;
+        cookieEnd = varCookie.length;
+
+    } else {
+
+        cookieStart = 0;
+        cookieEnd = varCookie.indexOf("PHPSESSID") - 2;
+
+    }
+
     var objCookie;
 
     if (cookieStart >= 0 && cookieEnd >= 0) {
 
-        objCookie = JSON.parse(varCookie.substring(cookieStart, cookieEnd + 1));
+        console.info(varCookie);
+        console.info(cookieStart);
+        console.info(cookieEnd);
+        console.info(varCookie.substr(cookieStart,cookieEnd));
+        objCookie = JSON.parse(varCookie.substr(cookieStart,cookieEnd));
 
     }
 
