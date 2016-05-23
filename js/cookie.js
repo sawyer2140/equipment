@@ -29,10 +29,6 @@ function getCookie(name) {
 
     if (cookieStart >= 0 && cookieEnd >= 0) {
 
-        console.info(varCookie);
-        console.info(cookieStart);
-        console.info(cookieEnd);
-        console.info(varCookie.substr(cookieStart,cookieEnd));
         objCookie = JSON.parse(varCookie.substr(cookieStart,cookieEnd));
 
     }
