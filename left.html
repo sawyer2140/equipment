@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>导航页面</title>
+    <META HTTP-EQUIV="pragma"   CONTENT="no-cache">
+    <META HTTP-EQUIV="cache-control"   CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires"   CONTENT="0">
+    <link href="css/left.css" rel="stylesheet">
+
+    <style type="text/css">
+        <!--
+        body, td, th {
+            font-family: 宋 体;
+            font-size: 13px;
+        }
+
+        -->
+    </style>
+</head>
+
+<body bgcolor="#EEEEEE">
+<div id="menu" align="center"></div>
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/json2.js"></script>
+<script src="js/cookie.js"></script>
+
+<script type="text/javascript" language="javascript">
+
+    $(function() {
+
+        var request = new Object();
+        request.mode = "getMenu";
+
+        var user = new Object();
+        user.identity = getCookie("user").user.identity;
+
+        request.datas = user;
+
+        $.post("action/leftAction.php", {"request":JSON.stringify(request)}, function(result) {
+
+            $.each(result.datas.menu, function(i, menu) {
+
+
+                var divImg = $("<div>");
+                divImg.attr("id", menu.id);
+                divImg.addClass(menu.icon);
+                divImg.attr("onmouseover", "imgShow(" + menu.id + ")");
+                divImg.attr("onmouseout", "imgFade(" + menu.id + ")");
+                divImg.attr("onClick", "toPage(" + menu.id + ",'" + menu.url + "')");
+
+                var divText = $("<div>");
+                divText.attr("id", "text_" + menu.id);
+                divText.attr("style", "color: #A7A7A7");
+                divText.text(menu.name);
+
+                $("#menu").append(divImg, $("<br>"), divText, $("<br>"), $("<br>"));
+
+            });
+
+        }, "json");
+
+    });
+
+    function imgShow(id) {
+
+        var imgClass = $("#" + id).attr("class");
+        if (imgClass.indexOf("-active") < 0) {
+            $("#" + id).removeClass();
+            $("#" + id).attr("class", (imgClass + "-active"));
+        }
+
+        var imgText = $("#text_" + id).attr("style");
+        if (imgText.indexOf("#000") < 0) {
+            $("#text_" + id).attr("style", "color: #000");
+        }
+
+    }
+
+    var tag;
+    function toPage(id, url) {
+
+        if (tag && tag != id) {
+            var imgClass = $("#" + tag).attr("class");
+            $("#" + tag).removeClass();
+            $("#" + tag).attr("class", imgClass.substr(0, imgClass.length - 7));
+            $("#text_" + tag).attr("style", "color: #A7A7A7");
+        }
+
+        tag = id;
+
+        window.parent.frames["mainFrame"].location.href = url;
+
+    }
+
+    function imgFade(id) {
+
+        if (tag != id) {
+            var imgClass = $("#" + id).attr("class");
+            if (imgClass.indexOf("-active") > 0) {
+                $("#" + id).removeClass();
+                $("#" + id).attr("class", imgClass.substr(0, imgClass.length - 7));
+            }
+
+            var imgText = $("#text_" + id).attr("style");
+            if (imgText.indexOf("#A7A7A7") < 0) {
+                $("#text_" + id).attr("style", "color: #A7A7A7");
+
+            }
+        }
+    }
+
+</script>
+</body>
+</html>

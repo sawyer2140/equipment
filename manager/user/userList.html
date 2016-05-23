@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>用户管理</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-responsive.min.css" rel="stylesheet">
+
+</head>
+<body>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#">用户管理</a></li>
+            <li><a href="userAdd.html">新增用户</a></li>
+        </ul>
+    </div>
+    <div class="span8 control-group pull-right">
+        <i class="icon-user" id="searchUser" title="用户名称"></i>
+        &nbsp;<input class="span2" id="userNames" type="text" style="margin-bottom:0px;">&nbsp;&nbsp;
+        <i class="icon-envelope" id="searchLogin" title="用户帐号"></i>
+        &nbsp;<input class="span2" id="loginNames" type="text" style="margin-bottom:0px;">
+        &nbsp;
+        <button class="btn btn-large btn-primary" id="search"><i class="icon-search icon-white"></i>&nbsp;查询&nbsp;
+        </button>
+        &nbsp;
+    </div>
+</div>
+<div class="row">
+    <div class="span5"> &nbsp;</div>
+    <div class="span5" id="updateResult"> &nbsp;</div>
+    <div class="span2"> &nbsp;</div>
+</div>
+
+<table class="table" id="userList">
+    <thead>
+    <tr>
+        <th><i class="icon-user"></i>&nbsp;用户名称</th>
+        <th><i class="icon-envelope"></i>&nbsp;登录帐号</th>
+        <th><i class="icon-time"></i>&nbsp;注册时间</th>
+        <th><i class="icon-time"></i>&nbsp;最后登录</th>
+        <th><i class="icon-road"></i>&nbsp;用户身份</th>
+        <th><i class="icon-cog"></i>&nbsp;操作</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal hide" id="modal">
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal"><i class="icon-remove"></i> </a>
+
+        <h3>操作列表</h3>
+    </div>
+    <div class="modal-body">
+        <div id="update_userId" class="hide"></div>
+        <p>
+
+        <div id="updateError"></div>
+        &nbsp;</p>
+
+        <div class="control-group">
+            <i class="icon-user"></i>&nbsp;用户名称
+            <input type="text" id="update_userName" onblur="check(this);">
+            <span id="error_userName" class="help-inline hide">名称是不包含空格的2-10位字符</span>
+        </div>
+        </p>
+        <p>&nbsp;</p>
+
+        <p>
+
+        <div class="control-group">
+            <i class="icon-envelope"></i>&nbsp;登录帐号
+            <input type="text" id="update_loginName" onblur="check(this);">
+            <span id="error_loginName" class="help-inline hide">名称是不包含空格的5-10位字符</span>
+        </div>
+        </p>
+
+        <p>&nbsp;</p>
+
+        <p>
+
+        <div class="control-group">
+            <i class="icon-road"></i>&nbsp;用户身份
+            <select class="span2" id="update_Identity">
+                <option value="0">管理员</option>
+                <option value="1">查询用户</option>
+            </select>
+        </div>
+        </p>
+        <p>&nbsp;</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-large btn-primary" id="update_save" data-dismiss="modal"><i class="icon-ok icon-white"></i>&nbsp;保存更改</a>
+    </div>
+</div>
+
+<div id="pages"></div>
+<div id="icoShow" style="position:absolute;z-index:10000;left: 10px;top:3px" class="span4"></div>
+<script src="../../js/jquery-1.7.2.min.js"></script>
+<script src="../../js/json2.js"></script>
+<script src="../../js/blockui.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/page.js"></script>
+<script src="../../js/bootstrap-modal.js"></script>
+<script src="../../js/bootstrap-tooltip.js"></script>
+<script src="../../js/bootstrap-alert.js"></script>
+<script language="javascript">
+
+    $(function() {
+
+        $("#searchUser").tooltip({"placement":"bottom"});
+        $("#searchLogin").tooltip({"placement":"bottom"});
+
+    });
+
+    var limitNum = 8;
+    var actionPage = "../../action/userAction.php";
+    var users = new Object();
+
+    $("#search").click(function() {
+
+        users.userName = $("#userNames").val();
+        users.loginName = $("#loginNames").val();
+
+        users.startNum = 1;
+        users.limitNum = limitNum;
+
+        postData(users);
+
+    });
+
+    function gotoPage(activePage) {
+        users.startNum = activePage;
+        postData(users);
+    }
+
+    function postData(users) {
+
+        var request = new Object();
+        request.mode = "getUsers";
+        request.datas = users;
+
+        $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+            getTbody(result.datas.user);
+            getPagination(result.datas.count, result.datas.startNum, result.datas.limitNum);
+
+        }, "json");
+    }
+
+    function getTbody(users) {
+
+        $("tbody").empty();
+        $.each(users, function(idex, user) {
+
+            var tr = $("<tr>");
+            tr.attr("id", user.id);
+            tr.append($("<td>").text(user.userName), $("<td>").text(user.loginName),
+                    $("<td>").text(user.signDate), $("<td>").text(user.lastLoginDate));
+
+            var identity = user.identity == 1 ? "查询用户" : "管理员";
+            tr.append($("<td>").text(identity));
+
+            var updateImg = $("<img>");
+            updateImg.attr("src", "../../img/update.gif");
+            updateImg.bind("click", function() {
+                updates(user);
+            });
+
+            tr.append($("<td>").append(updateImg));
+            $("tbody").append(tr);
+
+        });
+    }
+
+    function updates(user) {
+
+        $("#modal").modal();
+
+        $("#update_userId").html(user.id);
+        $("#update_userName").val(user.userName);
+        $("#update_loginName").val(user.loginName);
+        $("#update_Identity ").val(user.identity);
+
+    }
+
+    $("#update_save").click(function() {
+
+        var userId = $.trim($("#update_userId").text());
+        var loginName = $.trim($("#update_loginName").val());
+        var userName = $.trim($("#update_userName").val());
+        var identity = $.trim($("#update_Identity").val());
+
+        if (loginName != "" && userName != "") {
+
+            var user = new Object();
+            user.id = userId;
+            user.loginName = loginName;
+            user.userName = userName;
+            user.identity = identity;
+
+            var request = new Object();
+            request.mode = "updateUser";
+            request.datas = user;
+
+            $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+                if (result.status == "success") {
+
+                    $("#updateResult").show();
+                    $("#updateResult").html(getAlertDiv(result.status));
+
+                    $("#" + user.id).children().eq(0).html(user.userName);
+                    $("#" + user.id).children().eq(1).html(user.loginName);
+                    $("#" + user.id).children().eq(4).html(user.identity == 1 ? "查询用户" : "管理员");
+
+                    $("#" + user.id).attr("style", "color: #B94A48");
+                    $("#updateResult").delay(4000).hide(700);
+
+                } else {
+
+                    $(".modal").modal();
+                    $("#result").html(getAlertDiv(result.status));
+
+                }
+
+            }, "json");
+        }
+
+    });
+
+    $("#update_save").confirm({
+
+        msg:'确定进行本次操作？',
+        timeout:5000,
+        dialogShow:'fadeIn',
+        dialogSpeed:'slow',
+        buttons:{separator:' '}
+
+    });
+
+    $('#modal').on('hide', function () {
+
+        $("#updateError").empty();
+        $("#update_userName").parent().removeClass("error");
+        $("#update_userName").next().addClass("hide");
+        $("#update_loginName").parent().removeClass("error");
+        $("#update_loginName").next().addClass("hide");
+
+    });
+
+</script>
+</body>
+
+</html>

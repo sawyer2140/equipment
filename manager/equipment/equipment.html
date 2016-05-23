@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>维修器件统计平台</title>
+    <META   HTTP-EQUIV="pragma"   CONTENT="no-cache">
+    <META   HTTP-EQUIV="cache-control"   CONTENT="no-cache">
+    <META   HTTP-EQUIV="Expires"   CONTENT="0">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-responsive.min.css" rel="stylesheet">
+
+</head>
+<body>
+<p>&nbsp;</p>
+
+<div class="row form-inline">
+
+    <div class="span3">
+        <ul class="nav nav-pills">
+            <li class="active"><a href="#">备件管理</a></li>
+            <li id="li_add"><a href="equipmentAdd.html">录入备件</a></li>
+        </ul>
+    </div>
+    <div class="span9 control-group pull-right">
+        <strong>名称</strong>&nbsp;<input class="span1" id="search_name" type="text" >&nbsp;&nbsp;
+        <strong>型号</strong>&nbsp;<input class="span2" id="search_model" type="text" >&nbsp;&nbsp;
+        <strong>存放位置</strong>&nbsp;<input class="span2" id="search_depositPlace" type="text" >&nbsp;
+        &nbsp;&nbsp;
+        <button class="btn btn-primary" id="search"><i class="icon-search icon-white"></i>&nbsp;查询&nbsp;</button>
+        <button class="btn btn-success" id="exp"><i class="icon-download-alt icon-white"></i>&nbsp;导出&nbsp;
+        </button>
+        &nbsp;
+
+    </div>
+</div>
+<div class="row">
+    <div class="span5"> &nbsp;</div>
+    <div class="span5" id="updateResult"> &nbsp;</div>
+    <div class="span2" > &nbsp;</div>
+</div>
+
+<table class="table" id="userList">
+    <thead>
+    <tr>
+        <th><i class="icon-th-large"></i>&nbsp;存放位置</th>
+        <th><i class="icon-home"></i>&nbsp;使用位置</th>
+        <th><i class="icon-leaf"></i>&nbsp;备件名称</th>
+        <th><i class="icon-th-list"></i>&nbsp;型号</th>
+        <th><i class="icon-road"></i>&nbsp;厂家</th>
+        <th><i class="icon-cog"></i>&nbsp;数量</th>
+        <th><i class="icon-cog"></i>&nbsp;备注</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal hide" id="modal">
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal"><i class="icon-remove"></i> </a>
+
+        <h3>操作列表</h3>
+    </div>
+    <div class="modal-body">
+        <div id="update_equipmentId" class="hide"></div>
+
+        <p>&nbsp;</p>
+        <p>
+
+        <div class="control-group">
+            <i class="icon-time"></i>&nbsp;存放位置*&nbsp;
+            <input type="text" id="update_depositPlace" class="input-medium" onblur="check(this);">
+            <span class="help-inline hide">存放位置不能为空</span>
+        </div>
+
+        <p>&nbsp;</p>
+
+        </p>
+
+        <p>
+        <div class="control-group">
+            <i class="icon-time"></i>&nbsp;型号&nbsp;
+            <input type="text" id="update_model" class="span5" >
+        </div>
+        </p>
+
+        <p>&nbsp;</p>
+
+        <p>
+
+        <div class="control-group">
+            <i class="icon-time"></i>&nbsp;使用位置&nbsp;
+            <input type="text" id="update_usePlace" class="input-medium" >
+        </div>
+        </p>
+        <p>&nbsp;</p>
+
+        <p>
+        <div class="control-group">
+            <i class="icon-home"></i>&nbsp;备件名称&nbsp;
+            <input type="text" id="update_name" >
+
+        </div>
+        </p>
+        <p>&nbsp;</p>
+
+        <p>
+        <div class="control-group">
+            <i class="icon-road"></i>&nbsp;备件厂家&nbsp;
+            <input type="text" id="update_company" class="input-medium">
+
+        </div>
+        </p>
+        <p>&nbsp;</p>
+        <p>
+        <div class="control-group">
+            <i class="icon-cog"></i>&nbsp;备件数量*&nbsp;
+            <input type="text" id="update_number" class="input-mini">
+
+        </div>
+        </p>
+        <p>&nbsp;</p>
+        <p>
+        <div class="control-group">
+            <i class="icon-cog"></i>&nbsp;取件人*&nbsp;
+            <input type="text" id="update_person" class="input-mini">
+        </div>
+        </p>
+        <p>&nbsp;</p>
+        <p>
+        <div class="control-group">
+            <i class="icon-file"></i>&nbsp;备 注&nbsp;
+            <textarea class="input-xlarge" id="update_details" rows="3"></textarea>
+        </div>
+        </p>
+
+        <p>
+
+        <div id="updateError"></div>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-success" id="update_save"><i class="icon-ok icon-white"></i>&nbsp;保存更改</a>
+        <a class="btn btn-danger" id="delete_save"><i class="icon-remove icon-white"></i>&nbsp;确认删除</a>
+    </div>
+</div>
+
+<div id="pages"></div>
+<div id="icoShow" style="position:absolute;z-index:10000;left: 10px;top:3px" class="span4"></div>
+<script src="../../js/jquery-1.7.2.min.js"></script>
+<script src="../../js/json2.js"></script>
+<script src="../../js/blockui.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/page.js"></script>
+<script src="../../js/bootstrap-modal.js"></script>
+<script src="../../js/bootstrap-tooltip.js"></script>
+<script src="../../js/bootstrap-alert.js"></script>
+<script src="../../js/cookie.js"></script>
+<script language="javascript">
+
+    var identity = getCookie("user").user.identity;
+
+    $(function(){
+
+        if(identity == 1 ){
+            $("#li_add").hide();
+        }
+
+    });
+
+    var limitNum = 25;
+    var actionPage = "../../action/equipmentAction.php";
+    var equipments = new Object();
+
+    $("#search").click(function() {
+
+        equipments.name = $("#search_name").val();
+        equipments.model = $("#search_model").val();
+        equipments.depositPlace = $("#search_depositPlace").val();
+
+        equipments.startNum = 1;
+        equipments.limitNum = limitNum;
+
+        postData(equipments);
+
+    });
+
+    function gotoPage(activePage) {
+        equipments.startNum = activePage;
+        postData(equipments);
+    }
+
+    function postData(equipments) {
+
+        var request = new Object();
+        request.mode = "getEquipments";
+        request.datas = equipments;
+
+        $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+            if (result.datas.equipment) {
+
+                getTbody(result.datas.equipment);
+                getPagination(result.datas.count, result.datas.startNum, result.datas.limitNum);
+
+            } else {
+
+		$("tbody").empty();
+                $("#pages").empty();
+
+                $("#updateResult").html(getAlertDiv(result.status));
+                $("#updateResult").delay(4000).hide(700);
+            }
+        }, "json");
+    }
+
+    function getTbody(equipments) {
+
+        $("tbody").empty();
+        $.each(equipments, function(idex, equipment) {
+
+            var tr = $("<tr>");
+            tr.attr("id", equipment.id);
+
+            if(identity==0){
+
+                var depositPlaceLink = $("<a>");
+                depositPlaceLink.text(equipment.depositPlace);
+                depositPlaceLink.attr("href", "#");
+                depositPlaceLink.bind("click", function() {
+                    updates(equipment);
+                });
+                tr.append($("<td>").html(depositPlaceLink));
+
+            }else{
+
+                tr.append($("<td>").text(equipment.depositPlace));
+            }
+
+            tr.append($("<td>").text(equipment.usePlace), $("<td>").text(equipment.name),
+                    $("<td>").text(equipment.model),
+                    $("<td>").text(equipment.company), $("<td>").text(equipment.number),
+                    $("<td>").text(equipment.details));
+
+            $("tbody").append(tr);
+
+        });
+    }
+
+    function updates(equipment) {
+
+        $("#modal").modal();
+
+        $("#update_equipmentId").html(equipment.id);
+        $("#update_model").val(equipment.model);
+        $("#update_name").val(equipment.name);
+        $("#update_usePlace").val(equipment.usePlace);
+        $("#update_depositPlace").val(equipment.depositPlace);
+        $("#update_company").val(equipment.company);
+        $("#update_number").val(equipment.number);
+        $("#update_details").val(equipment.details);
+
+    }
+
+    $("#update_save").click(function() {
+
+        var id = $.trim($("#update_equipmentId").text());
+        var model = $.trim($("#update_model").val());
+        var name = $.trim($("#update_name").val());
+        var usePlace = $.trim($("#update_usePlace").val());
+        var company = $.trim($("#update_company").val());
+        var depositPlace = $.trim($("#update_depositPlace").val());
+        var number = $.trim($("#update_number").val());
+        var person = $.trim($("#update_person").val());
+        var details = $.trim($("#update_details").val());
+
+        if ( depositPlace != "" && number != "") {
+
+            $("#modal").modal('hide');
+
+            var equipment = new Object();
+            equipment.id = id;
+            equipment.model = model;
+            equipment.name = name;
+            equipment.usePlace = usePlace;
+            equipment.depositPlace = depositPlace;
+            equipment.company = company;
+            equipment.number = number;
+            equipment.person = person;
+            equipment.details = details;
+
+            var request = new Object();
+            request.mode = "updateEquipment";
+            request.datas = equipment;
+
+            $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+                if (result.status == "success") {
+
+
+                    $("#updateResult").show();
+                    $("#updateResult").html(getAlertDiv(result.status));
+
+                    $("#" + equipment.id).children().eq(0).html(equipment.depositPlace);
+                    $("#" + equipment.id).children().eq(1).html(equipment.usePlace);
+                    $("#" + equipment.id).children().eq(2).html(equipment.name);
+                    $("#" + equipment.id).children().eq(3).html(equipment.model);
+                    $("#" + equipment.id).children().eq(4).html(equipment.company);
+                    $("#" + equipment.id).children().eq(5).html(equipment.number);
+                    $("#" + equipment.id).children().eq(6).html(equipment.details);
+                    $("#" + equipment.id).attr("style", "color: #B94A48");
+
+                    $("#updateResult").delay(4000).hide(700);
+
+                } else {
+
+                    $("#errorResult").html(getAlertDiv("errFormat"));
+
+                }
+
+            }, "json");
+
+        } else {
+
+            $("#updateError").html(getAlertDiv("errFormat"));
+
+        }
+
+    });
+
+    $("#update_save").confirm({
+
+        msg:'确定进行本次操作？',
+        timeout:5000,
+        dialogShow:'fadeIn',
+        dialogSpeed:'slow',
+        buttons:{separator:' '}
+
+    });
+
+
+    $("#delete_save").click(function() {
+
+        var id = $.trim($("#update_equipmentId").text());
+
+
+            $("#modal").modal('hide');
+
+            var equipment = new Object();
+            equipment.id = id;
+
+            var request = new Object();
+            request.mode = "deleteEquipment";
+            request.datas = equipment;
+
+            $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+                if (result.status == "success") {
+
+                    $("#updateResult").show();
+                    $("#updateResult").html(getAlertDiv(result.status));
+                    $("#"+equipment.id).remove();
+
+                    $("#updateResult").delay(4000).hide(700);
+
+                } else {
+
+                    $("#errorResult").html(getAlertDiv("errFormat"));
+
+                }
+
+            }, "json");
+
+
+
+    });
+
+    $("#delete_save").confirm({
+
+        msg:'确定进行本次操作？',
+        timeout:5000,
+        dialogShow:'fadeIn',
+        dialogSpeed:'slow',
+        buttons:{separator:' '}
+
+    });
+
+    $('#modal').on('hide', function () {
+
+        $("#updateError").empty();
+
+        $("#update_model").parent().removeClass("error");
+        $("#update_model").next().addClass("hide");
+        $("#update_name").parent().removeClass("error");
+        $("#update_name").next().addClass("hide");
+        $("#update_usePlace").parent().removeClass("error");
+        $("#update_usePlace").next().addClass("hide");
+        $("#update_depositPlace").parent().removeClass("error");
+        $("#update_depositPlace").next().addClass("hide");
+        $("#update_company").parent().removeClass("error");
+        $("#update_company").next().addClass("hide");
+        $("#update_number").parent().removeClass("error");
+        $("#update_number").next().addClass("hide");
+
+    });
+
+    function checkNumber(obj) {
+
+        var number = $.trim($(obj).val());
+        if (number == "" || isNaN(number)) {
+
+            $(obj).parent().addClass("error");
+            $(obj).next().removeClass("hide");
+            return false;
+
+        } else {
+
+            $(obj).parent().removeClass("error");
+            $(obj).next().addClass("hide");
+            return true;
+        }
+    }
+
+    $("#exp").click(function(){
+
+        location.target = "_blank";
+        location.href="../../action/expAction.php";
+
+
+    });
+</script>
+</body>
+
+</html>

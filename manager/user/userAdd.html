@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>新增用户</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-responsive.min.css" rel="stylesheet">
+</head>
+<body>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span8">
+        <ul class="nav nav-pills">
+            <li><a href="userList.html">用户管理</a></li>
+            <li class="active"><a href="#">新增用户</a></li>
+        </ul>
+    </div>
+    <div class="span4 pull-right"><a href="#" class="btn btn-large btn-danger">
+        <i class="icon-th-list icon-white"></i>&nbsp;<strong>新增用户</strong></a>
+    </div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span5"> &nbsp;</div>
+    <div class="span5" id="addResult"> &nbsp;</div>
+    <div class="span2"> &nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+
+    <div class="span4">&nbsp;</div>
+    <div class="span8 control-group "><i class="icon-user"></i>&nbsp;用户名称
+        &nbsp;&nbsp;
+        <input type="text" class="input-large" id="userName" onblur="check(this);">&nbsp;&nbsp;
+        <span id="error_userName" class="help-inline hide">名称是不包含空格的2-10位字符</span></div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-envelope"></i>&nbsp;登录帐号
+        &nbsp;&nbsp;
+        <input type="text" class="input-xlarge" id="loginName" onblur="check(this);">&nbsp;&nbsp;
+        <span id="error_loginName" class="help-inline hide">名称是不包含空格的5-10位字符</span></div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-lock"></i>&nbsp;登录密码
+        &nbsp;&nbsp;
+        <input type="password" class="input-medium" id="passWord" onblur="check(this);">&nbsp;&nbsp;
+        <span id="error_passWord" class="help-inline hide">名称是不包含空格的5-10位字符</span></div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-lock"></i>&nbsp;确认密码
+        &nbsp;&nbsp;
+        <input type="password" class="input-medium" id="confirmPwd" onblur="confirmPwd(this);">&nbsp;&nbsp;
+        <span id="error_confirm" class="help-inline hide">两次输入密码不符合</span></div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4"> &nbsp;</div>
+    <div class="span8 control-group">
+        <i class="icon-road"></i>&nbsp;所属身份
+        &nbsp;&nbsp;
+        <select class="span2" id="identity" onblur="check(this);">
+            <option value="">所属身份</option>
+            <option value="0">管理员</option>
+            <option value="1">查询用户</option>
+        </select>&nbsp;&nbsp;
+        <span id="error_Identity" class="help-inline hide">请选择所属身份</span></div>
+</div>
+</div>
+
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4"> &nbsp;</div>
+    <div class="span6">
+        <legend></legend>
+    </div>
+    <div class="span2"> &nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span6"> &nbsp;</div>
+    <div class="span4"><a class="btn btn-large btn-primary" id="add_save"><i
+            class="icon-ok icon-white"></i>&nbsp;<strong>保存更改</strong></a></div>
+    <div class="span2">&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+
+<div id="icoShow" style="position:absolute;z-index:10000;left: 10px;top:3px" class="span4"></div>
+<script src="../../js/jquery-1.7.2.min.js"></script>
+<script src="../../js/json2.js"></script>
+<script src="../../js/blockui.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/bootstrap-alert.js"></script>
+<script language="javascript">
+
+    var actionPage = "../../action/userAction.php";
+    $("#add_save").click(function() {
+
+        var userName = $.trim($("#userName").val());
+        var loginName = $.trim($("#loginName").val());
+        var passWord = $.trim($("#passWord").val());
+        var identity = $.trim($("#identity").val());
+
+        if (loginName != "" && userName != "" && identity != "" && passWord != "") {
+
+            var user = new Object();
+            user.loginName = loginName;
+            user.userName = userName;
+            user.passWord = passWord;
+            user.identity = identity;
+
+            var request = new Object();
+            request.mode = "addUser";
+            request.datas = user;
+
+            $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+                $("#addResult").show();
+                $("#addResult").html(getAlertDiv(result.status));
+                $("#addResult").delay(4000).hide(700);
+
+                if (result.status == "success") {
+
+                    $("#userName").val("");
+                    $("#loginName").val("");
+                    $("#passWord").val("");
+                    $("#confirmPwd").val("");
+                    $("#identity ").val("");
+
+                }
+
+            }, "json");
+        }
+
+    });
+
+    $("#add_save").confirm({
+
+        msg:'确定进行本次操作？',
+        timeout:5000,
+        dialogShow:'fadeIn',
+        dialogSpeed:'slow',
+        buttons:{separator:' '}
+
+    });
+
+    function confirmPwd(obj) {
+
+        if ($.trim($(obj).val()) != $.trim($("#passWord").val())) {
+
+            $(obj).parent().addClass("error");
+            $(obj).next().removeClass("hide");
+
+        } else {
+
+            $(obj).parent().removeClass("error");
+            $(obj).next().addClass("hide");
+
+        }
+    }
+
+  
+</script>
+</body>
+
+</html>

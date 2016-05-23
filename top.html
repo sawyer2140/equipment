@@ -1,0 +1,79 @@
+<meta charset="utf-8">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="css/doc.css" rel="stylesheet">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li>
+                        <a><strong>维修器件统计平台</strong></a>
+                    </li>
+                </ul>
+                <ul class="nav pull-right">
+                    <li class="active"><a id="userName"><i class="icon-user icon-white"></i>&nbsp;</a>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li><a id="nowTime">
+
+                    </a></li>
+                    <li class="divider-vertical"></li>
+                    <li>
+                        <button class="btn btn-danger" onclick="exit();"><i class="icon-off icon-white"></i>&nbsp;立即注销&nbsp;
+                        </button>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="subnav subnav-fixed">
+    <ul class="nav nav-pills">
+        <li><a><img src="img/ico.png" width="25" height="25"/></a></li>
+        <li><a href="index.html"><strong>首 页</strong></a></li>
+        <li><a id="signDate"><i class="icon-chevron-up"></i>&nbsp;用户注册时间： </a></li>
+
+        <li><a id="lastLoginDate"> <i class="icon-chevron-down"></i>&nbsp;本用户前次登录时间： </a></a></li>
+    </ul>
+</div>
+
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/cookie.js"></script>
+<script src="js/json2.js"></script>
+<script type="text/javascript">
+
+    $(function() {
+        var cookie = getCookie("user");
+        $("#userName").append(cookie.user.userName);
+        $("#signDate").append(cookie.user.signDate);
+        $("#lastLoginDate").append(cookie.user.lastLoginDate);
+    })
+
+    function showDate() {
+
+        var date = new Date();
+
+        var dateStr = "<i class=\"icon-time icon-white\"></i>&nbsp;";
+        dateStr += date.getFullYear() + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日\r";
+        dateStr += "星期" + '日一二三四五六'.charAt(date.getDay()) + "\r" + date.getHours() + ":";
+        var minutes = date.getMinutes();
+
+        if (minutes < 10) {
+            dateStr += "0";
+        }
+
+        dateStr += minutes;
+
+        $("#nowTime").html(dateStr);
+        setTimeout("showDate()", 60000);
+
+    }
+    showDate();
+
+    function exit() {
+        window.parent.location.href = "login.html";
+    }
+</script>

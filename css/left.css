@@ -1,0 +1,83 @@
+[class^="left-"], [class*=" left-"] {
+    display: inline-block;
+    width: 33px;
+    height: 33px;
+    line-height: 20px;
+    vertical-align: text-top;
+    background-image: url("../img/left.png");
+    background-position: 14px 14px;
+    background-repeat: no-repeat;
+    *margin-right: .3em;
+}
+
+.left-house {
+    background-position: 0 -693px;
+}
+
+.left-house-active {
+    background-position: 0 -33px;
+}
+
+.left-point {
+    background-position: 0 -264px;
+}
+
+.left-point-active {
+    background-position: 0 -66px;
+}
+
+.left-video-active {
+    background-position: 0 -99px;
+}
+
+.left-video {
+    background-position: 0 -132px;
+}
+
+.left-person {
+    background-position: 0 -165px;
+}
+
+.left-person-active {
+    background-position: 0 -858px;
+}
+
+.left-compass-active {
+    background-position: 0 -198px;
+}
+
+.left-compass {
+    background-position: 0 -594px;
+}
+
+.left-camera-active {
+    background-position: 0 -297px;
+}
+
+.left-camera {
+    background-position: 0 -660px;
+}
+
+.left-circle-active {
+    background-position: 0 -330px;
+}
+
+.left-circle {
+    background-position: 0 -462px;
+}
+
+.left-x {
+    background-position: 0 -495px;
+}
+
+.left-x-active {
+    background-position: 0 -429px;
+}
+
+.left-square {
+    background-position: 0 -825px;
+}
+
+.left-square-active {
+    background-position: 0 -627px;
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>维修器件统计平台</title>
+
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/doc.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/ico.png" type="/image/x-icon">
+</head>
+
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">&nbsp;</div>
+</div>
+
+<header class="jumbotron masthead">
+    <p>
+
+    <h1><img src="img/ico.png" height="100" width="100"/>维修器件统计平台</h1></p>
+    <p>
+        <legend></legend>
+    </p>
+
+    <p>
+
+    <div class="row">
+        <div class="span4">&nbsp;</div>
+        <div class="span8">
+            <div class="control-group">
+                <i class="icon-user"></i>&nbsp;登录帐号&nbsp;&nbsp;
+                <input type="text" class="focused" id="loginName" value="请输入用户名..." onblur="check(this);"
+                       onclick="this.value='';">
+                <span class="help-inline hide"><i class="icon-remove"></i> 输入信息有误,该信息不容许包含空格或留空</span>
+            </div>
+        </div>
+    </div>
+    </p>
+
+    <p>
+
+    <div class="row">
+        <div class="span4">&nbsp;</div>
+        <div class="span8">
+            <div class="control-group">
+                <i class="icon-lock"></i>&nbsp;登录密码&nbsp;&nbsp;
+                <input type="password" id="password" onblur="check(this);">
+                <span class="help-inline hide"><i class="icon-remove"></i> 输入信息有误,该信息不容许包含空格或留空</span>
+            </div>
+        </div>
+    </div>
+    </p>
+
+    <p>
+
+    <div class="row">
+        <div class="span4">&nbsp;</div>
+        <div class="span8">
+            <div class="control-group">
+                <i class="icon-th"></i>&nbsp;验证序码&nbsp;&nbsp;<img id="code" src="code.php"/>&nbsp;&nbsp;
+                <input type="text" class="input-mini" id="verifyCode"
+                       onblur="check(this);">&nbsp;&nbsp;<a id="refresh" href="#">刷新验证码</a>
+                <span class="help-inline hide"><i class="icon-remove"></i> 输入信息有误,该信息不容许包含空格或留空</span>
+            </div>
+        </div>
+    </div>
+    </p>
+    <div class="row">
+        <div class="span4">&nbsp;</div>
+        <div id="errorInfo" class="span2">&nbsp;</div>
+        <div class="span2">&nbsp;</div>
+        <div class="span4">&nbsp;</div>
+    </div>
+    <div class="row">
+        <div class="span4">&nbsp;</div>
+        <div class="span8">
+            <button id="login" class="btn btn-primary" data-loading-text="正在登录..."> 确认登录</button>
+            &nbsp;
+            <button class="btn" type="reset"> 取 消</button>
+        </div>
+    </div>
+    </p>
+
+    <ul class="quick-links">
+        <div id="user_navigator"></div>
+    </ul>
+    <ul class="quick-links englan">Copyright © 2012, Inc. All Rights Reserved.</ul>
+
+</header>
+
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/bootstrap-button.js"></script>
+<script src="js/json2.js"></script>
+<script src="js/cookie.js"></script>
+<script type="text/javascript" language="javascript">
+
+    $("#refresh").click(function() {
+        $("#code").attr("src", "code.php");
+    });
+    $(function() {
+
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.indexOf("chrome") == -1) {
+            var a = $("<a>");
+            a.attr("href", "http://www.google.cn/chrome");
+            a.attr("target", "_blank");
+            a.addClass("btn btn-danger");
+            a.text("立即下载");
+
+            var img = $("<img>");
+            img.attr("src", "img/chrome.png");
+            img.attr("width", 30);
+            img.attr("hegiht", 30);
+
+            $("#user_navigator").append("该系统只支持", img,
+                    "浏览器,使用其他浏览器可能存在兼容问题,请更换您的浏览器", a);
+        }
+
+    });
+
+    function check(obj) {
+
+        if ($.trim($(obj).val()) == "") {
+
+            $(obj).parent().addClass("error");
+            $(obj).next().removeClass("hide");
+
+        } else {
+
+            $(obj).parent().removeClass("error");
+            $(obj).next().addClass("hide");
+
+        }
+
+    }
+
+    $("#login").click(function() {
+
+        var loginName = $.trim($("#loginName").val());
+        var password = $.trim($("#password").val());
+        var verifyCode = $.trim($("#verifyCode").val());
+
+        if (loginName != "" && password != "" && verifyCode != "") {
+
+            var user = new Object();
+            user.loginName = loginName;
+            user.password = password;
+            user.verifyCode = verifyCode;
+
+            var request = new Object();
+            request.mode = "login";
+            request.datas = user;
+
+            $.post("action/loginAction.php", {"request":JSON.stringify(request)}, function(result) {
+
+
+                switch (result.status) {
+
+                    case "failed":
+                        $("#errorInfo").addClass("alert alert-error");
+                        $("#errorInfo").text("登录出错");
+                        break;
+                    case "codeErr":
+                        $("#errorInfo").addClass("alert alert-error");
+                        $("#errorInfo").text("验证码错误");
+                        break;
+                    case "success":
+                        doLogin(result.datas);
+                        break;
+
+                }
+            }, "json");
+        }
+
+    });
+
+    function doLogin(userData) {
+
+        if (userData == null) {
+
+            $("#errorInfo").addClass("alert alert-error");
+            $("#errorInfo").text("用户名或密码错误");
+
+        } else {
+
+            var user = new Object();
+            user.id = userData.id;
+            user.loginName = userData.loginName;
+            user.userName = userData.userName;
+            user.signDate = userData.signDate;
+            user.lastLoginDate = userData.lastLoginDate;
+            user.identity = userData.identity;
+
+            document.cookie = JSON.stringify({"user":user});
+
+            location.href = "index.html";
+
+        }
+    }
+
+    $(document).ajaxStart(
+            function() {
+                $("#login").button("loading");
+            }).ajaxStop(function() {
+                $("#login").button("reset");
+            });
+
+</script>
+
+</body>
+</html>

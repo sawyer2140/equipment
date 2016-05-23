@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>新增备件</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-responsive.min.css" rel="stylesheet">
+</head>
+<body>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span8">
+        <ul class="nav nav-pills">
+            <li><a href="equipment.html">备件管理</a></li>
+            <li class="active"><a href="#">录入备件</a></li>
+        </ul>
+    </div>
+    <div class="span4 pull-right"><a href="#" class="btn btn-large btn-danger">
+        <i class="icon-th-list icon-white"></i>&nbsp;<strong>新增备件</strong></a>
+    </div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span5"> &nbsp;</div>
+    <div class="span5" id="addResult"> &nbsp;</div>
+    <div class="span2"> &nbsp;</div>
+</div>
+<div class="row">
+
+    <div class="span4">&nbsp;</div>
+    <div class="span8 control-group "><i class="icon-th-large"></i>&nbsp;备件型号
+        &nbsp;&nbsp;
+        <input type="text" class="input-large" id="model" >&nbsp;&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-home"></i>&nbsp;备件名称
+        &nbsp;&nbsp;
+        <input type="text" class="input-xlarge" id="name">&nbsp;&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-time"></i>&nbsp;使用位置
+        &nbsp;&nbsp;
+        <input type="text" class="input-medium" id="usePlace" >&nbsp;&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-lock"></i>&nbsp;存放位置<strong>*</strong>
+        &nbsp;&nbsp;
+        <input type="text" class="input-medium" id="depositPlace" onblur="check(this);">&nbsp;&nbsp;
+        <span id="error_depositPlace" class="help-inline hide">名称不能为空!</span></div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4"> &nbsp;</div>
+    <div class="span8 control-group">
+        <i class="icon-road"></i>&nbsp;备件厂家
+        &nbsp;&nbsp;
+        <input type="text" class="input-medium" id="company" data-provide="typeahead" >&nbsp;&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-cog"></i>&nbsp;备件数量<strong>*</strong>
+        &nbsp;&nbsp;
+        <input type="text" class="input-mini" id="number" >&nbsp;&nbsp;
+    </div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4">&nbsp;</div>
+    <div class="span8  control-group">
+        <i class="icon-file"></i>&nbsp;&nbsp;&nbsp;备&nbsp;&nbsp;注&nbsp;&nbsp;&nbsp;&nbsp;
+        <textarea id="details" rows="3"></textarea>
+    </div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span4"> &nbsp;</div>
+    <div class="span6">
+        <legend></legend>
+    </div>
+    <div class="span2"> &nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span6"> &nbsp;</div>
+    <div class="span4"><a class="btn btn-large btn-primary" id="add_save"><i
+            class="icon-ok icon-white"></i>&nbsp;<strong>保存更改</strong></a></div>
+    <div class="span2">&nbsp;</div>
+</div>
+<p>&nbsp;</p>
+
+<div id="icoShow" style="position:absolute;z-index:10000;left: 10px;top:3px" class="span4"></div>
+<script src="../../js/jquery-1.7.2.min.js"></script>
+<script src="../../js/json2.js"></script>
+<script src="../../js/blockui.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/bootstrap-typeahead.js"></script>
+<script src="../../js/bootstrap-alert.js"></script>
+<script language="javascript">
+
+    var actionPage = "../../action/equipmentAction.php";
+
+    $(function() {
+
+        var request = new Object();
+        request.mode = "getCompany";
+        $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+            var source = Array();
+            var i = 0;
+            $.each(result.datas.equipment, function(i, equipment) {
+                source[i] = equipment.company;
+                i++;
+            });
+
+            $('#company').typeahead({"source":source});
+
+        }, "json");
+
+
+    });
+
+    $("#add_save").click(function() {
+
+        var model = $.trim($("#model").val());
+        var name = $.trim($("#name").val());
+        var usePlace = $.trim($("#usePlace").val());
+        var depositPlace = $.trim($("#depositPlace").val());
+        var company = $.trim($("#company").val());
+        var number = $.trim($("#number").val());
+        var details = $.trim($("#details").val());
+
+        if (check("#depositPlace") && check("#number")) {
+
+            var equipment = new Object();
+            equipment.model = model;
+            equipment.name = name;
+            equipment.usePlace = usePlace;
+            equipment.depositPlace = depositPlace;
+            equipment.company = company;
+            equipment.number = number;
+            equipment.details = details;
+
+            var request = new Object();
+            request.mode = "addEquipment";
+            request.datas = equipment;
+
+            $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+                $("#addResult").show();
+                $("#addResult").html(getAlertDiv(result.status));
+                $("#addResult").delay(4000).hide(700);
+
+                if (result.status == "success") {
+
+                    $("#model").val("");
+                    $("#name").val("");
+                    $("#usePlace").val("");
+                    $("#depositPlace").val("");
+                    $("#company").val("");
+                    $("#number").val("");
+                    $("#details").val("");
+
+                }
+
+            }, "json");
+        }
+
+    });
+
+    $("#add_save").confirm({
+
+        msg:'确定进行本次操作？',
+        timeout:5000,
+        dialogShow:'fadeIn',
+        dialogSpeed:'slow',
+        buttons:{separator:' '}
+
+    });
+
+    function checkNumber(obj) {
+
+        var number = $.trim($(obj).val());
+        if (number == "" || isNaN(number)) {
+
+            $(obj).parent().addClass("error");
+            $(obj).next().removeClass("hide");
+            return false;
+
+        } else {
+
+            $(obj).parent().removeClass("error");
+            $(obj).next().addClass("hide");
+            return true;
+        }
+    }
+    function checkCompany(obj) {
+
+        var company = $.trim($(obj).val());
+        alert(company);
+        var flag = false;
+        if (company == "") {
+
+            $(obj).parent().addClass("error");
+            $(obj).next().removeClass("hide");
+
+
+        } else {
+
+            $(obj).parent().removeClass("error");
+            $(obj).next().addClass("hide");
+            flag = true;
+        }
+
+        if (company == "others") {
+            $("#others").removeClass("hide");
+        }
+        return flag;
+    }
+
+</script>
+</body>
+
+</html>

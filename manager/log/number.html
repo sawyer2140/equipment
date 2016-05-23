@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+    <title>维修器件统计平台</title>
+    <META   HTTP-EQUIV="pragma"   CONTENT="no-cache">
+    <META   HTTP-EQUIV="cache-control"   CONTENT="no-cache">
+    <META   HTTP-EQUIV="Expires"   CONTENT="0">
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-responsive.min.css" rel="stylesheet">
+
+</head>
+<body>
+<p>&nbsp;</p>
+
+<div class="row">
+    <div class="span2">&nbsp;</div>
+    <div class="span10 control-group pull-right">
+        <strong>名称</strong>&nbsp;<input class="span1" id="search_name" type="text" >&nbsp;&nbsp;
+        <strong>型号</strong>&nbsp;<input class="span2" id="search_model" type="text" >&nbsp;&nbsp;
+        <strong>存放位置</strong>&nbsp;<input class="span3" id="search_depositPlace" type="text" >&nbsp;
+        &nbsp;&nbsp;
+        <button class="btn btn-large btn-primary" id="search"><i class="icon-search icon-white"></i>&nbsp;查询&nbsp;
+        </button>
+        &nbsp;
+    </div>
+</div>
+<div class="row">
+    <div class="span5"> &nbsp;</div>
+    <div class="span5" id="updateResult"> &nbsp;</div>
+    <div class="span2"> &nbsp;</div>
+</div>
+
+<table class="table" id="userList">
+    <thead>
+    <tr>
+        <th><i class="icon-th-large"></i>&nbsp;存放位置</th>
+        <th><i class="icon-leaf"></i>&nbsp;备件名称</th>
+        <th><i class="icon-th-list"></i>&nbsp;型号</th>
+        <th><i class="icon-cog"></i>&nbsp;原数量</th>
+        <th><i class="icon-cog"></i>&nbsp;现数量</th>
+        <th><i class="icon-cog"></i>&nbsp;取件人</th>
+        <th><i class="icon-cog"></i>&nbsp;操作时间</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div id="pages"></div>
+<div id="icoShow" style="position:absolute;z-index:10000;left: 10px;top:3px" class="span4"></div>
+<script src="../../js/jquery-1.7.2.min.js"></script>
+<script src="../../js/json2.js"></script>
+<script src="../../js/blockui.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../js/page.js"></script>
+<script src="../../js/bootstrap-tooltip.js"></script>
+<script src="../../js/bootstrap-alert.js"></script>
+<script src="../../js/cookie.js"></script>
+<script language="javascript">
+
+var limitNum = 25;
+var actionPage = "../../action/logAction.php";
+var logs = new Object();
+
+$("#search").click(function() {
+
+    logs.name = $("#search_name").val();
+    logs.model = $("#search_model").val();
+    logs.depositPlace = $("#search_depositPlace").val();
+
+    logs.startNum = 1;
+    logs.limitNum = limitNum;
+
+    postData(logs);
+
+});
+
+function gotoPage(activePage) {
+    logs.startNum = activePage;
+    postData(logs);
+}
+
+function postData(logs) {
+
+    var request = new Object();
+    request.mode = "getLogs";
+    request.datas = logs;
+
+    $.post(actionPage, {"request":JSON.stringify(request)}, function(result) {
+
+        if (result.datas.log) {
+
+            getTbody(result.datas.log);
+            getPagination(result.datas.count, result.datas.startNum, result.datas.limitNum);
+
+        } else {
+
+            $("tbody").empty();
+            $("#pages").empty();
+
+            $("#updateResult").html(getAlertDiv(result.status));
+            $("#updateResult").delay(4000).hide(700);
+        }
+    }, "json");
+}
+
+function getTbody(logs) {
+
+    $("tbody").empty();
+    $.each(logs, function(idex, log) {
+
+        var tr = $("<tr>");
+
+        tr.append($("<td>").text(log.depositPlace),$("<td>").text(log.name), $("<td>").text(log.model),
+                $("<td>").text(log.oldNumber),
+                $("<td>").text(log.newNumber),$("<td>").text(log.person), $("<td>").text(log.submitTime));
+
+        $("tbody").append(tr);
+
+    });
+}
+</script>
+</body>
+
+</html>
