@@ -20,7 +20,7 @@ class menusDao
         $query = ("select id,name,url,icon from menu_info");
 
         if($identity==1){
-            $query .= " where id <> 2";
+            $query .= " where id not in (2,3)";
         }
 
         $conn = new connect();
