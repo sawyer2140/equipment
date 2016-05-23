@@ -20,7 +20,7 @@ class equipmentDao
                  "',usePlace = '" . $equipment->getUsePlace() . "',depositPlace='" . $equipment->getDepositPlace() .
                  "',number = '" . $equipment->getNumber() . "',details = '" . $equipment->getDetails() . "',person = '" . $equipment->getPerson() .
             "' where id = " . $equipment->getId() ;
-        //echo $query;
+//        echo $query;
         $conn = new connect();
         $conn->getConnect();
 
@@ -50,7 +50,7 @@ class equipmentDao
 
         $conn = new connect();
         $conn->getConnect();
-        echo $query;
+//        echo $query;
         $resultSet = mysql_query($query);
 
         $result = new result();
