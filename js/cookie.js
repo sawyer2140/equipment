@@ -15,7 +15,7 @@ function getCookie(name) {
 
     if (varCookie.indexOf("PHPSESSID") == 0) {
 
-        cookieStart = varCookie.indexOf("PHPSESSID") + 1;
+        cookieStart = varCookie.indexOf(";") + 1;
         cookieEnd = varCookie.length;
 
     } else {
