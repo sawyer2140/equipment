@@ -38,7 +38,6 @@
         <th><i class="icon-th-large"></i>&nbsp;存放位置</th>
         <th><i class="icon-leaf"></i>&nbsp;备件名称</th>
         <th><i class="icon-th-list"></i>&nbsp;型号</th>
-        <th><i class="icon-cog"></i>&nbsp;原数量</th>
         <th><i class="icon-cog"></i>&nbsp;现数量</th>
         <th><i class="icon-cog"></i>&nbsp;取件人</th>
         <th><i class="icon-cog"></i>&nbsp;操作时间</th>
@@ -114,7 +113,6 @@ function getTbody(logs) {
         var tr = $("<tr>");
 
         tr.append($("<td>").text(log.depositPlace),$("<td>").text(log.name), $("<td>").text(log.model),
-                $("<td>").text(log.oldNumber),
                 $("<td>").text(log.newNumber),$("<td>").text(log.person), $("<td>").text(log.submitTime));
 
         $("tbody").append(tr);

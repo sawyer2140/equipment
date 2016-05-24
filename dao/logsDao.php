@@ -101,7 +101,7 @@ class logsDao {
 //         echo " select model,name,depositPlace,oldNumber,newNumber,submitTime,operator " .
 //             " from log_number " . $query . $orderBy . $limitStr;
 
-        $resultSet = mysql_query(" select model,name,depositPlace,oldNumber,newNumber,submitTime,person " .
+        $resultSet = mysql_query(" select model,name,depositPlace,newNumber,submitTime,person " .
             " from log_number" . $query . $orderBy . $limitStr);
 
         $result = new result();
@@ -122,10 +122,9 @@ class logsDao {
                 $log->setModel($row[0]);
                 $log->setName($row[1]);
                 $log->setDepositPlace($row[2]);
-                $log->setOldNumber($row[3]);
-                $log->setNewNumber($row[4]);
-                $log->setSubmitTime($row[5]);
-                $log->setPerson($row[6]);
+                $log->setNewNumber($row[3]);
+                $log->setSubmitTime($row[4]);
+                $log->setPerson($row[5]);
 
                 $logsArray[$i] = $log;
 

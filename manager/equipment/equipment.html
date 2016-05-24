@@ -18,7 +18,7 @@
 
     <div class="span3">
         <ul class="nav nav-pills">
-            <li class="active"><a href="#">备件管理</a></li>
+            <li class="active"><a href="#">备件管理.</a></li>
             <li id="li_add"><a href="equipmentAdd.html">录入备件</a></li>
         </ul>
     </div>
@@ -28,7 +28,7 @@
         <strong>存放位置</strong>&nbsp;<input class="span2" id="search_depositPlace" type="text" >&nbsp;
         &nbsp;&nbsp;
         <button class="btn btn-primary" id="search"><i class="icon-search icon-white"></i>&nbsp;查询&nbsp;</button>
-        <button class="btn btn-success" id="exp"><i class="icon-download-alt icon-white"></i>&nbsp;导出&nbsp;
+        <button id="btn_exp" class="btn btn-success" id="exp"><i class="icon-download-alt icon-white"></i>&nbsp;导出&nbsp;
         </button>
         &nbsp;
 
@@ -165,6 +165,7 @@
 
         if(identity == 1 ){
             $("#li_add").hide();
+            $("#btn_exp").hide();
         }
 
     });
